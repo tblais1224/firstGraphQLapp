@@ -1,7 +1,13 @@
 const express = require("express");
 const graphqlHTTP = require("express-graphql")
+const schema = require("./schema/schema")
 
 const app = express();
+
+//graphql middleware to handle gql reqs
+app.use("/graphql", graphqlHTTP({
+    schema
+}))
 
 
 
