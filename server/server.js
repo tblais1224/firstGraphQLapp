@@ -6,7 +6,8 @@ const app = express();
 
 //graphql middleware to handle gql reqs
 app.use("/graphql", graphqlHTTP({
-    schema
+    schema,
+    graphiql: true
 }))
 
 
