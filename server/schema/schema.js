@@ -193,7 +193,19 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent, args){
         return games
       }
-    }
+    },
+    platforms: {
+      type: new GraphQLList(PlatformType),
+      resolve(parent, args){
+        return platforms
+      }
+    },
+    designers: {
+      type: new GraphQLList(DesignerType),
+      resolve(parent, args){
+        return designers
+      }
+    },
   }
 });
 
