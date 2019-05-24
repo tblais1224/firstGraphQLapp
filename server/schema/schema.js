@@ -1,8 +1,8 @@
 const graphql = require("graphql");
 const _ = require("lodash");
-const Game = require('../models/Game')
-const Platform = require('../models/Platform')
-const Designer = require('../models/Designer')
+const Game = require("../models/Game");
+const Platform = require("../models/Platform");
+const Designer = require("../models/Designer");
 
 const {
   GraphQLObjectType,
@@ -12,8 +12,6 @@ const {
   GraphQLInt,
   GraphQLList
 } = graphql;
-
-
 
 const GameType = new GraphQLObjectType({
   name: "Game",
@@ -52,7 +50,7 @@ const PlatformType = new GraphQLObjectType({
     games: {
       type: new GraphQLList(GameType),
       resolve(parent, args) {
-        return _.filter(games, {platformId: parent.id});
+        return _.filter(games, { platformId: parent.id });
       }
     }
   })
@@ -66,7 +64,6 @@ const DesignerType = new GraphQLObjectType({
     age: { type: GraphQLInt }
   })
 });
-
 
 const RootQuery = new GraphQLObjectType({
   name: "RootQueryType",
@@ -96,25 +93,49 @@ const RootQuery = new GraphQLObjectType({
     },
     games: {
       type: new GraphQLList(GameType),
-      resolve(parent, args){
-        return games
+      resolve(parent, args) {
+        return games;
       }
     },
     platforms: {
       type: new GraphQLList(PlatformType),
-      resolve(parent, args){
-        return platforms
+      resolve(parent, args) {
+        return platforms;
       }
     },
     designers: {
       type: new GraphQLList(DesignerType),
-      resolve(parent, args){
-        return designers
+      resolve(parent, args) {
+        return designers;
       }
-    },
+    }
+  }
+});
+
+//setup mutations
+const Mutation = new GraphQLObjectType({
+  name: "Mutation",
+  fields: {
+    addDesigner: {
+      type: DesignerType,
+      //args are passed in from user on front end
+      args: {
+        name: { type: GraphQLString },
+        age: { type: GraphQLInt }
+      },
+      resolve(parent, args) {
+        //create an instance of the designer model
+        let designer = new Designer({
+          name: args.name,
+          age: args.age
+        });
+        return designer.save().catch(err => console.log(err))
+      }
+    }
   }
 });
 
 module.exports = new GraphQLSchema({
-  query: RootQuery
+  query: RootQuery,
+  mutation: Mutation
 });
