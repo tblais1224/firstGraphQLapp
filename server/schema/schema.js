@@ -20,19 +20,20 @@ const GameType = new GraphQLObjectType({
     name: { type: GraphQLString },
     developer: { type: GraphQLString },
     publisher: { type: GraphQLString },
-    designer: { type: GraphQLString },
     genre: { type: GraphQLString },
     platform: {
       type: PlatformType,
       resolve(parent, args) {
         //parent returns the game data in this case
-        return _.find(platforms, { id: parent.platformId });
+        // return _.find(platforms, { id: parent.platformId });
+        return Platform.findById(parent.platformId)
       }
     },
     designer: {
       type: DesignerType,
       resolve(parent, args) {
-        return _.find(designers, { id: parent.designerId });
+        // return _.find(designers, { id: parent.designerId });
+        return Designer.findById(parent.designerId)
       }
     }
   })
@@ -44,13 +45,14 @@ const PlatformType = new GraphQLObjectType({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
     manufacturer: { type: GraphQLString },
-    relaseDate: { type: GraphQLString },
+    releaseDate: { type: GraphQLString },
     value: { type: GraphQLInt },
     valueCIB: { type: GraphQLInt },
     games: {
       type: new GraphQLList(GameType),
       resolve(parent, args) {
-        return _.filter(games, { platformId: parent.id });
+      //   return _.filter(games, { platformId: parent.id });
+      return Game.find({platformId: parent.id})
       }
     }
   })
@@ -61,7 +63,14 @@ const DesignerType = new GraphQLObjectType({
   fields: () => ({
     id: { type: GraphQLID },
     name: { type: GraphQLString },
-    age: { type: GraphQLInt }
+    age: { type: GraphQLInt },
+    games: {
+      type: new GraphQLList(GameType),
+      resolve(parent, args) {
+      //   return _.filter(games, { platformId: parent.id });
+      return Game.find({designerId: parent.id})
+      }
+    }
   })
 });
 
@@ -74,39 +83,41 @@ const RootQuery = new GraphQLObjectType({
       resolve(parent, args) {
         //code to get the data from db or source of data
         //use lodash to find id using args
-        return _.find(games, { id: args.id });
+        // return _.find(games, { id: args.id });
+        return Game.findById(args.id)
       }
     },
     designer: {
       type: DesignerType,
       args: { id: { type: GraphQLID } },
       resolve(parent, args) {
-        return _.find(designers, { id: args.id });
+        return Designer.findById(args.id)
       }
     },
     platform: {
       type: PlatformType,
       args: { id: { type: GraphQLID } },
       resolve(parent, args) {
-        return _.find(platforms, { id: args.id });
+        return Platform.findById(args.id)
       }
     },
     games: {
       type: new GraphQLList(GameType),
       resolve(parent, args) {
-        return games;
+        //returns all games
+        return Game.find({});
       }
     },
     platforms: {
       type: new GraphQLList(PlatformType),
       resolve(parent, args) {
-        return platforms;
+        return Platform.find({});
       }
     },
     designers: {
       type: new GraphQLList(DesignerType),
       resolve(parent, args) {
-        return designers;
+        return Designer.find({});
       }
     }
   }
@@ -116,6 +127,29 @@ const RootQuery = new GraphQLObjectType({
 const Mutation = new GraphQLObjectType({
   name: "Mutation",
   fields: {
+    addGame: {
+      type: GameType,
+      args: {
+        name: { type: GraphQLString },
+        developer: { type: GraphQLString },
+        publisher: { type: GraphQLString },
+        genre: { type: GraphQLString },
+        designerId: { type: GraphQLID },
+        platformId: { type: GraphQLID }
+      },
+      resolve(parent, args) {
+        let game = new Game({
+          name: args.name,
+          developer: args.developer,
+          publisher: args.publisher,
+          genre: args.genre,
+          platformId: args.platformId,
+          designerId: args.designerId
+        });
+        return game.save().catch(err => console.log(err));
+      }
+    },
+
     addDesigner: {
       type: DesignerType,
       //args are passed in from user on front end
@@ -129,7 +163,30 @@ const Mutation = new GraphQLObjectType({
           name: args.name,
           age: args.age
         });
-        return designer.save().catch(err => console.log(err))
+        return designer.save().catch(err => console.log(err));
+      }
+    },
+
+    addPlatform: {
+      type: PlatformType,
+      //args are passed in from user on front end
+      args: {
+        name: { type: GraphQLString },
+        manufacturer: { type: GraphQLString },
+        releaseDate: { type: GraphQLString },
+        value: { type: GraphQLInt },
+        valueCIB: { type: GraphQLInt }
+      },
+      resolve(parent, args) {
+        //create an instance of the Platform model
+        let platform = new Platform({
+          name: args.name,
+          manufacturer: args.manufacturer,
+          releaseDate: args.releaseDate,
+          value: args.value,
+          valueCIB: args.valueCIB
+        });
+        return platform.save().catch(err => console.log(err));
       }
     }
   }

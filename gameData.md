@@ -44,7 +44,7 @@ const games = [
     genre: "Beat 'em up, hack and slash, Action role-playing",
     id: "5",
     platformId: "3",
-    designerId: "2, 3"
+    designerId: "4, 3"
   }
 ];
 
