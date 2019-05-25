@@ -10,7 +10,8 @@ const {
   GraphQLSchema,
   GraphQLID,
   GraphQLInt,
-  GraphQLList
+  GraphQLList,
+  GraphQLNonNull
 } = graphql;
 
 const GameType = new GraphQLObjectType({
@@ -26,14 +27,14 @@ const GameType = new GraphQLObjectType({
       resolve(parent, args) {
         //parent returns the game data in this case
         // return _.find(platforms, { id: parent.platformId });
-        return Platform.findById(parent.platformId)
+        return Platform.findById(parent.platformId);
       }
     },
     designer: {
       type: DesignerType,
       resolve(parent, args) {
         // return _.find(designers, { id: parent.designerId });
-        return Designer.findById(parent.designerId)
+        return Designer.findById(parent.designerId);
       }
     }
   })
@@ -51,8 +52,8 @@ const PlatformType = new GraphQLObjectType({
     games: {
       type: new GraphQLList(GameType),
       resolve(parent, args) {
-      //   return _.filter(games, { platformId: parent.id });
-      return Game.find({platformId: parent.id})
+        //   return _.filter(games, { platformId: parent.id });
+        return Game.find({ platformId: parent.id });
       }
     }
   })
@@ -67,8 +68,8 @@ const DesignerType = new GraphQLObjectType({
     games: {
       type: new GraphQLList(GameType),
       resolve(parent, args) {
-      //   return _.filter(games, { platformId: parent.id });
-      return Game.find({designerId: parent.id})
+        //   return _.filter(games, { platformId: parent.id });
+        return Game.find({ designerId: parent.id });
       }
     }
   })
@@ -84,21 +85,21 @@ const RootQuery = new GraphQLObjectType({
         //code to get the data from db or source of data
         //use lodash to find id using args
         // return _.find(games, { id: args.id });
-        return Game.findById(args.id)
+        return Game.findById(args.id);
       }
     },
     designer: {
       type: DesignerType,
       args: { id: { type: GraphQLID } },
       resolve(parent, args) {
-        return Designer.findById(args.id)
+        return Designer.findById(args.id);
       }
     },
     platform: {
       type: PlatformType,
       args: { id: { type: GraphQLID } },
       resolve(parent, args) {
-        return Platform.findById(args.id)
+        return Platform.findById(args.id);
       }
     },
     games: {
@@ -130,12 +131,12 @@ const Mutation = new GraphQLObjectType({
     addGame: {
       type: GameType,
       args: {
-        name: { type: GraphQLString },
-        developer: { type: GraphQLString },
-        publisher: { type: GraphQLString },
-        genre: { type: GraphQLString },
+        name: { type: new GraphQLNonNull(GraphQLString) },
+        developer: { type: new GraphQLNonNull(GraphQLString) },
+        publisher: { type: new GraphQLNonNull(GraphQLString) },
+        genre: { type: new GraphQLNonNull(GraphQLString) },
         designerId: { type: GraphQLID },
-        platformId: { type: GraphQLID }
+        platformId: { type: new GraphQLNonNull(GraphQLID) }
       },
       resolve(parent, args) {
         let game = new Game({
@@ -154,7 +155,7 @@ const Mutation = new GraphQLObjectType({
       type: DesignerType,
       //args are passed in from user on front end
       args: {
-        name: { type: GraphQLString },
+        name: { type: new GraphQLNonNull(GraphQLString) },
         age: { type: GraphQLInt }
       },
       resolve(parent, args) {
@@ -171,9 +172,9 @@ const Mutation = new GraphQLObjectType({
       type: PlatformType,
       //args are passed in from user on front end
       args: {
-        name: { type: GraphQLString },
-        manufacturer: { type: GraphQLString },
-        releaseDate: { type: GraphQLString },
+        name: { type: new GraphQLNonNull(GraphQLString) },
+        manufacturer: { type: new GraphQLNonNull(GraphQLString) },
+        releaseDate: { type: new GraphQLNonNull(GraphQLString) },
         value: { type: GraphQLInt },
         valueCIB: { type: GraphQLInt }
       },
@@ -186,12 +187,27 @@ const Mutation = new GraphQLObjectType({
           value: args.value,
           valueCIB: args.valueCIB
         });
-        return platform.save().catch(err => console.log(err));
+        // if(!Platform.findOne({name: args.name}, (err, res))){
+        //   console.log("Does not exist in DB!")
+        //   return platform.save().catch(err => console.log(err))
+        // }else {
+        //   console.log("Already exists in DB!")
+        // }
+        Platform.findOne({ name: args.name }, (err, res) => {
+          if (err) {
+            console.log(err, "Already exists in DB!");
+          }
+          if (!res) {
+            addToDb()
+          }
+        });
+        function addToDb (){
+          return platform.save().catch(err => console.log(err));
+        }
       }
     }
   }
 });
-
 module.exports = new GraphQLSchema({
   query: RootQuery,
   mutation: Mutation
