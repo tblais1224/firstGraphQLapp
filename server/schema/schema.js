@@ -187,23 +187,8 @@ const Mutation = new GraphQLObjectType({
           value: args.value,
           valueCIB: args.valueCIB
         });
-        // if(!Platform.findOne({name: args.name}, (err, res))){
-        //   console.log("Does not exist in DB!")
-        //   return platform.save().catch(err => console.log(err))
-        // }else {
-        //   console.log("Already exists in DB!")
-        // }
-        Platform.findOne({ name: args.name }, (err, res) => {
-          if (err) {
-            console.log(err, "Already exists in DB!");
-          }
-          if (!res) {
-            addToDb()
-          }
-        });
-        function addToDb (){
-          return platform.save().catch(err => console.log(err));
-        }
+
+        return platform.save().catch(err => console.log(err));
       }
     }
   }
