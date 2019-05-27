@@ -29,7 +29,7 @@ const addGameMutation = gql`
     $developer: String!
     $publisher: String!
     $platformId: ID!
-    $designerId: ID
+    $designerId: ID!
   ) {
     addGame(
       name: $name
