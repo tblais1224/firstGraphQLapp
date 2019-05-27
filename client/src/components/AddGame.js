@@ -1,6 +1,9 @@
 import React, { Component } from "react";
-import { graphql } from "react-apollo";
-import { getDesignersPlatformsQuery } from "../queries/queries";
+import { graphql, compose } from "react-apollo";
+import {
+  getDesignersPlatformsQuery,
+  addGameMutation
+} from "../queries/queries";
 
 class AddGame extends Component {
   constructor(props) {
@@ -14,13 +17,29 @@ class AddGame extends Component {
       platformId: ""
     };
     this.onChange = this.onChange.bind(this);
+    this.submitForm = this.submitForm.bind(this);
   }
+
   onChange(e) {
     this.setState({ [e.target.name]: e.target.value });
-  };
+  }
+
+  submitForm(e) {
+    e.preventDefault();
+    this.props.addGameMutation({
+      variables: {
+        name: this.state.name,
+        publisher: this.state.publisher,
+        developer: this.state.developer,
+        genre: this.state.genre,
+        designerId: this.state.designerId,
+        platformId: this.state.platformId
+      }
+    });
+  }
 
   displayDesigners() {
-    let data = this.props.data;
+    let data = this.props.getDesignersPlatformsQuery;
     if (data.loading) {
       return <option disabled>Loading Designers...</option>;
     } else {
@@ -34,7 +53,7 @@ class AddGame extends Component {
     }
   }
   displayPlatforms() {
-    let data = this.props.data;
+    let data = this.props.getDesignersPlatformsQuery;
     if (data.loading) {
       return <option disabled>Loading Platforms...</option>;
     } else {
@@ -49,9 +68,8 @@ class AddGame extends Component {
   }
 
   render() {
-    console.log(this.props);
     return (
-      <form id="add-game">
+      <form id="add-game" onSubmit={this.submitForm}>
         <div className="field">
           <label>Game Name: </label>
           <input type="text" name="name" onChange={this.onChange} />
@@ -82,8 +100,13 @@ class AddGame extends Component {
             {this.displayPlatforms()}
           </select>
         </div>
+        <button type="submit">Add Game</button>
       </form>
     );
   }
 }
-export default graphql(getDesignersPlatformsQuery)(AddGame);
+
+export default compose(
+  graphql(getDesignersPlatformsQuery, { name: "getDesignersPlatformsQuery" }),
+  graphql(addGameMutation, { name: "addGameMutation" })
+)(AddGame);
