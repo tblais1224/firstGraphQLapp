@@ -45,4 +45,43 @@ const addGameMutation = gql`
   }
 `;
 
-export { getGamesQuery, getDesignersPlatformsQuery, addGameMutation };
+// gets details for a single game
+const getGameQuery = gql`
+  query($id: ID) {
+    game(id: $id) {
+      id
+      name
+      genre
+      developer
+      publisher
+      platform {
+        id
+        name
+        manufacturer
+        releaseDate
+        value
+        valueCIB
+        games {
+          id
+          name
+        }
+      }
+      designer {
+        id
+        name
+        age
+        games {
+          id
+          name
+        }
+      }
+    }
+  }
+`;
+
+export {
+  getGamesQuery,
+  getDesignersPlatformsQuery,
+  addGameMutation,
+  getGameQuery
+};

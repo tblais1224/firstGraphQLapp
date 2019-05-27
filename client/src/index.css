@@ -1,7 +1,89 @@
 body{
-  background: #eee;
+  background-image: url("./vgWallpaper.jpg");
+  background-size: 80%;
+  background-repeat: repeat-y;
+  background-position-x: -30px;
+  background-position-y: top;
   font-family: "Ariel"
 }
+#main h1{
+  color: 444;
+  text-align: center
+}
+#main{
+  padding: 0px;
+  box-sizing: border-box;
+  width: 60%;
+  height: 100%
+}
+
 #game-list{
-  
+  padding: 0
+}
+
+.game-list li {
+  display: inline-block;
+  background: #fff;
+  opacity: 0.8;
+  margin: 5px;
+  padding: 10px;
+  border-radius: 4px;
+  border: 2px solid #880E45;
+  box-shadow: 1px 2px 3px rgba(0,0,0,0.3);
+  cursor: pointer;
+  font-size: 18px;
+  color: orangered;
+  font-weight: 400
+}
+
+form{
+  background: #fff;
+  padding: 20px;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 400px
+}
+
+form .field{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 10px
+}
+
+form label{
+  text-align: right;
+  padding: 6px
+}
+
+form select, form input{
+  margin: 4px;
+  padding: 6px;
+  box-sizing: border-box
+}
+
+form button {
+  color: white;
+  font-size: 1em;
+  background: #AD1457;
+  border: 0;
+  padding: 0 10px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 10px;
+  left: 10px
+}
+
+#game-details{
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 40%;
+  height: 100%;
+  background: #AD1457;
+  padding: 30px;
+  overflow:auto;
+  box-shadow: -2px -3px 5px rgba(0,0,0,0.3);
+  box-sizing: border-box;
+  color: #fff
 }

@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import { graphql, compose } from "react-apollo";
 import {
   getDesignersPlatformsQuery,
-  addGameMutation
+  addGameMutation,
+  getGamesQuery
 } from "../queries/queries";
 
 class AddGame extends Component {
@@ -27,6 +28,7 @@ class AddGame extends Component {
   submitForm(e) {
     e.preventDefault();
     this.props.addGameMutation({
+      //sends variables to the queries file
       variables: {
         name: this.state.name,
         publisher: this.state.publisher,
@@ -34,7 +36,9 @@ class AddGame extends Component {
         genre: this.state.genre,
         designerId: this.state.designerId,
         platformId: this.state.platformId
-      }
+      },
+      //after submit fetches new games list
+      refetchQueries: [{ query: getGamesQuery }]
     });
   }
 

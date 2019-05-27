@@ -1,8 +1,20 @@
 import React, { Component } from "react";
 import { graphql } from "react-apollo";
-import {getGamesQuery} from "../queries/queries"
+import { getGamesQuery } from "../queries/queries";
+import GameDetails from "./GameDetailes"
 
 class GameList extends Component {
+    constructor(props){
+        super(props)
+        this.state = {
+            selected: null
+        }
+        this.onClick = this.onClick.bind(this);
+    }
+
+    onClick(e){
+        this.setState({ selected: e.target.id });
+    }
 
   displayGames() {
     //this.props is the gql response
@@ -12,7 +24,7 @@ class GameList extends Component {
       return <div>Loading Game...</div>;
     } else {
       return data.games.map(game => {
-        return <li>{game.name}</li>;
+        return <li onClick={this.onClick} id={game.id}>{game.name}</li>;
       });
     }
   }
@@ -20,7 +32,8 @@ class GameList extends Component {
   render() {
     return (
       <div>
-        <ul id="game-list">{this.displayGames()}</ul>
+        <ul className="game-list">{this.displayGames()}</ul>
+        <GameDetails gameId={this.state.selected}/>
       </div>
     );
   }
