@@ -3,8 +3,12 @@ const mongoose = require("mongoose")
 const graphqlHTTP = require("express-graphql")
 const schema = require("./schema/schema")
 const mongoURI = require("./config/keys").mongoURI
+const cors = require("cors")
 
 const app = express();
+
+// allow cross origin reqs
+app.use(cors())
 
 //connect to mongo atlas
 mongoose.connect(mongoURI, { useNewUrlParser: true })

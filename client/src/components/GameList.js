@@ -1,14 +1,28 @@
-import React, { Component } from 'react'
+import React, { Component } from "react";
+import { graphql } from "react-apollo";
+import {getGamesQuery} from "../queries/queries"
 
 class GameList extends Component {
-    render() {
-        return (
-            <div>
-                <ul id="game-list">
-                    <li>Game Name</li>
-                </ul>
-            </div>
-        )
+
+  displayGames() {
+    //this.props is the gql response
+    let data = this.props.data;
+    //check if request is loading
+    if (data.loading) {
+      return <div>Loading Game...</div>;
+    } else {
+      return data.games.map(game => {
+        return <li>{game.name}</li>;
+      });
     }
+  }
+
+  render() {
+    return (
+      <div>
+        <ul id="game-list">{this.displayGames()}</ul>
+      </div>
+    );
+  }
 }
-export default GameList
+export default graphql(getGamesQuery)(GameList);
